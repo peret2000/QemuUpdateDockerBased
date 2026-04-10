@@ -60,12 +60,17 @@ rm -rf ./qemu-dist
 
 ### Static user-mode build case
 
-If your Dockerfile produced a static user-mode QEMU (common for cross-arch builds under binfmt), the default binary name is typically `qemu-x86_64`. You should copy it to the standard binfmt target name:
+If your Dockerfile produced a static user-mode QEMU (common for cross-arch builds under binfmt), the default binary name is typically `qemu-x86_64`. You can create a link at the standard binfmt target name.  
+Beforehand, if  `qemu` is already installed in the system, it is advisable to tell the system package manager to not overwrite the locally built version every time it decides to update it: the system will create a _renamed_ version of its product.  
+So these are the steps:
 
 ```bash
+# In case qemu is already installed by the system
+sudo dpkg-divert --add --rename --divert /usr/bin/qemu-x86_64-static.distrib /usr/bin/qemu-x86_64-static
+
 # Typical location expected by binfmt for static user-mode QEMU:
 # (Adjust the architecture suffix if needed)
-sudo cp /usr/local/bin/qemu-x86_64 /usr/bin/qemu-x86_64-static
+sudo ln -s /usr/local/bin/qemu-x86_64 /usr/bin/qemu-x86_64-static
 ```
 
 - binfmt configurations commonly reference `qemu-<arch>-static`. Placing the new binary at this path ensures the binfmt handler uses it without additional configuration changes.
