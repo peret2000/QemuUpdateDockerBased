@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 AS build
+FROM ubuntu:26.04 AS build
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Dependencies for optimized static user-mode compilation
@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
-ARG QEMU_VERSION=10.1.0
+ARG QEMU_VERSION=11.0.3
 
 # Download source code
 RUN wget -O qemu.tar.gz https://github.com/qemu/qemu/archive/refs/tags/v${QEMU_VERSION}.tar.gz && \
