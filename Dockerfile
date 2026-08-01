@@ -55,4 +55,3 @@ RUN find /qemu-dist -type f -executable -exec strip --strip-unneeded {} + || tru
 # Minimal final stage
 FROM scratch
 COPY --from=build /qemu-dist/ /qemu-dist
-CMD ["/qemu-dist/usr/local/bin/qemu-x86_64", "--version"]
