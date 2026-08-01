@@ -1,7 +1,7 @@
 FROM ubuntu:22.04 AS build
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Dependencias para compilación user-mode estática optimizada
+# Dependencies for optimized static user-mode compilation
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
   git \
@@ -23,17 +23,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /build
 ARG QEMU_VERSION=10.1.0
 
-# Descarga del código fuente
+# Download source code
 RUN wget -O qemu.tar.gz https://github.com/qemu/qemu/archive/refs/tags/v${QEMU_VERSION}.tar.gz && \
     tar -xzf qemu.tar.gz && rm qemu.tar.gz
 
 WORKDIR /build/qemu-${QEMU_VERSION}
 
-# Flags de compilación (ajusta -O2/-Os/-O3 según preferencia)
+# Compilation flags (adjust -O2/-Os/-O3 according to preference)
 ENV CFLAGS="-O2 -g0" LDFLAGS="-s"
 
-# Configuración y build
-# Si alguna opción --disable-* diera error, elimínala.
+# Configuration and build
+# If any --disable-* option causes an error, remove it.
 RUN ./configure \
     --python=/usr/bin/python3 \
     --target-list=x86_64-linux-user \
@@ -49,10 +49,10 @@ RUN ./configure \
 #    make -j$(nproc) && \
 #    make install DESTDIR=/qemu-dist
 
-# Strip final (ignora errores si algo ya está limpio)
+# Final strip (ignore errors if something is already clean)
 RUN find /qemu-dist -type f -executable -exec strip --strip-unneeded {} + || true
 
-# Etapa final mínima
+# Minimal final stage
 FROM scratch
 COPY --from=build /qemu-dist/ /qemu-dist
 CMD ["/qemu-dist/usr/local/bin/qemu-x86_64", "--version"]
